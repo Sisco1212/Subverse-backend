@@ -20,11 +20,11 @@ const subscriptionSchema = mongoose.Schema({
     },
     frequency: {
         type: String,
-        enum: ['daily', 'weekly', 'monthly', 'yearly'],
+        enum: ['Daily', 'Weekly', 'Monthly', 'Yearly'],
     },
     category: {
         type: String,
-        enum: ['sports', 'news', 'entertainment', 'lifestyle', 'technology', 'finance', 'politics', 'other'],
+        enum: ['Sports', 'News', 'Entertainment', 'Lifestyle', 'Technology', 'Finance', 'Politics', 'Other'],
         required: true,
     },
     paymentMethod: {

@@ -23,10 +23,10 @@ export const createSubscription = async (req, res, next) => {
 
         subscription.workflowRunId = workflowRunId;
 
-await subscription.save();
+        await subscription.save();
 
 
-        res.status(201).json({ success: true, data: { subscription, workflowRunId } })
+        res.status(201).json({ success: true, data: { subscription, workflowRunId }, message: "Subscription created successfully" });
     } catch (error) {
         next(error);
     }
@@ -167,32 +167,32 @@ export const updateSubscription = async (req, res, next) => {
         subscription.set(updates);
         await subscription.save();
         if (
-    (req.body.startDate !== undefined ||
-    req.body.frequency !== undefined) &&
-    subscription.workflowRunId
-) {
-    await workflowClient.cancel(subscription.workflowRunId);
-}
+            (req.body.startDate !== undefined ||
+                req.body.frequency !== undefined) &&
+            subscription.workflowRunId
+        ) {
+            await workflowClient.cancel(subscription.workflowRunId);
+        }
 
-if (
-    req.body.startDate !== undefined ||
-    req.body.frequency !== undefined
-) {
-    const { workflowRunId } = await workflowClient.trigger({
-        url: `${SERVER_URL}/api/v1/workflows/subscription/reminder`,
-        body: {
-            subscriptionId: subscription.id,
-        },
-        headers: {
-            'content-type': 'application/json',
-        },
-        retries: 0,
-    });
+        if (
+            req.body.startDate !== undefined ||
+            req.body.frequency !== undefined
+        ) {
+            const { workflowRunId } = await workflowClient.trigger({
+                url: `${SERVER_URL}/api/v1/workflows/subscription/reminder`,
+                body: {
+                    subscriptionId: subscription.id,
+                },
+                headers: {
+                    'content-type': 'application/json',
+                },
+                retries: 0,
+            });
 
-    subscription.workflowRunId = workflowRunId;
+            subscription.workflowRunId = workflowRunId;
 
-    await subscription.save();
-}
+            await subscription.save();
+        }
 
         res.status(200).json({
             success: true,
@@ -226,8 +226,8 @@ export const cancelSubscription = async (req, res, next) => {
         await subscription.save();
 
         if (subscription.workflowRunId) {
-    await workflowClient.cancel(subscription.workflowRunId);
-}
+            await workflowClient.cancel(subscription.workflowRunId);
+        }
 
         res.status(200).json({
             success: true,
