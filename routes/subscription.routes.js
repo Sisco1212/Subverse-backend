@@ -16,7 +16,7 @@ subscriptionRouter.delete('/:id', authorize, deleteSubscription);
 
 subscriptionRouter.get('/user/:id', authorize, getUserSubscriptions);
 
-subscriptionRouter.put('/:id/cancel', authorize, cancelSubscription);
+subscriptionRouter.patch('/:id/cancel', authorize, cancelSubscription);
 
 subscriptionRouter.get('/renewals/upcoming', authorize, getUpcomingRenewals);
 

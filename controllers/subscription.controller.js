@@ -34,7 +34,7 @@ export const createSubscription = async (req, res, next) => {
 
 export const getUserSubscriptions = async (req, res, next) => {
     try {
-        if (req.user.id != req.params.id) {
+        if (req.user._id.toString() !== req.params.id) {
             const error = new Error("You are not the owner of this account");
             error.status = 401;
             throw error;
@@ -90,7 +90,8 @@ export const getAllSubscription = async (req, res, next) => {
 }
 
 export const updateSubscription = async (req, res, next) => {
-
+console.log("REQUEST BODY:", req.body);
+console.log("REQUEST BODY KEYS:", Object.keys(req.body));
     try {
         const subscription = await Subscription.findById(req.params.id);
 
@@ -131,7 +132,10 @@ export const updateSubscription = async (req, res, next) => {
 
         for (const field of allowedFields) {
             if (req.body[field] !== undefined) {
-                updates[field] = req.body[field];
+                updates[field] =
+                    field === "frequency"
+                        ? req.body[field].toLowerCase()
+                        : req.body[field];
             }
         }
 
@@ -140,8 +144,8 @@ export const updateSubscription = async (req, res, next) => {
             : subscription.startDate;
 
         const newFrequency = req.body.frequency !== undefined
-            ? req.body.frequency
-            : subscription.frequency;
+            ? req.body.frequency.toLowerCase()
+            : subscription.frequency.toLowerCase();
 
 
         if (
