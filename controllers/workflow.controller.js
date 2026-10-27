@@ -1,70 +1,70 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const { serve } = require('@upstash/workflow/express');
-import Subscription from '../models/subscription.model.js';
-import dayjs from 'dayjs';
-import { sendReminderEmail } from '../utils/send-email.js';
+import { createRequire } from "module";
 
+const require = createRequire(import.meta.url);
+const { serve } = require("@upstash/workflow/express");
+
+import Subscription from "../models/subscription.model.js";
+import dayjs from "dayjs";
+import { sendReminderEmail } from "../utils/send-email.js";
 
 const REMINDERS = [7, 5, 2, 1];
 
 export const sendReminders = serve(async (context) => {
-    const { subscriptionId } = context.requestPayload;
-    const subscription = await fetchSubscription(context, subscriptionId);
+  const { subscriptionId } = context.requestPayload;
 
-    if (!subscription || subscription.status != "active") return;
+  const subscription = await fetchSubscription(context, subscriptionId);
 
-    const renewalDate = dayjs(subscription.renewalDate);
+  if (!subscription || subscription.status !== "active") return;
 
-    if (renewalDate.isBefore(dayjs())) {
-        console.log(`Renewal date has passed for subscription ${subscriptionId}. Stopping workflow.`);
-        return;
+  const renewalDate = dayjs(subscription.renewalDate);
+
+  if (renewalDate.isBefore(dayjs())) {
+    console.log(
+      `Renewal date has passed for subscription ${subscriptionId}. Stopping workflow.`
+    );
+    return;
+  }
+
+  for (const daysBefore of REMINDERS) {
+    const reminderDate = renewalDate.subtract(daysBefore, "day");
+
+    if (dayjs().isSame(reminderDate, "day")) {
+      await triggerReminder(
+        context,
+        `${daysBefore} days before reminder`,
+        subscription
+      );
+    } else if (reminderDate.isAfter(dayjs())) {
+      await sleepUntilReminder(
+        context,
+        `${daysBefore} days before reminder`,
+        reminderDate
+      );
     }
-
-    for (const daysBefore of REMINDERS) {
-        const reminderDate = renewalDate.subtract(daysBefore, 'day');
-
-        //         console.log({
-        //     now: dayjs().format(),
-        //     renewalDate: renewalDate.format(),
-        //     daysBefore,
-        //     reminderDate: reminderDate.format(),
-        //     isAfter: reminderDate.isAfter(dayjs()),
-        //     isSameDay: dayjs().isSame(reminderDate, 'day'),
-        // });
-        if (dayjs().isSame(reminderDate, 'day')) {
-            await triggerReminder(context, `${daysBefore} days before reminder`, subscription);
-        } else if (reminderDate.isAfter(dayjs())) {
-            await sleepUntilReminder(
-                context,
-                `${daysBefore} days before reminder`,
-                reminderDate
-            );
-        }
-    }
-
+  }
 });
 
-
 const fetchSubscription = async (context, subscriptionId) => {
-    return await context.run('get subscription', async () => {
-        return Subscription.findById(subscriptionId).populate('user', 'name email');
-    })
-}
+  return await context.run("get subscription", async () => {
+    return await Subscription.findById(subscriptionId)
+      .populate("user", "name email")
+      .lean();
+  });
+};
 
 const sleepUntilReminder = async (context, label, date) => {
-    console.log(`Sleeping until ${label} at ${date}`);
-    await context.sleepUntil(label, date.toDate());
-}
+  console.log(`Sleeping until ${label} at ${date}`);
+  await context.sleepUntil(label, date.toDate());
+};
 
 const triggerReminder = async (context, label, subscription) => {
-    return await context.run(label, async () => {
-        console.log(`Trigerring ${label}`);
+  return await context.run(label, async () => {
+    console.log(`Triggering ${label}`);
 
-        await sendReminderEmail({
-            to: subscription.user.email,
-            type: label,
-            subscription,
-        })
-    })
-}
+    await sendReminderEmail({
+      to: subscription.user.email,
+      type: label,
+      subscription,
+    });
+  });
+};
