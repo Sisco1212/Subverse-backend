@@ -180,7 +180,7 @@ The repository metadata lists `https://subverse-backend.vercel.app` as the proje
 
 ## Screenshots
 
-This backend repository has no UI or screenshots. Add API-client examples or service diagrams here if they are introduced later.
+<img width="1312" height="592" alt="subverse" src="https://github.com/user-attachments/assets/89182063-0309-46cb-9c8d-ed52fc4089f0" />
 
 ## Possible future improvements
 
