@@ -181,6 +181,11 @@ The repository metadata lists `https://subverse-backend.vercel.app` as the proje
 ## Screenshots
 
 <img width="1312" height="592" alt="subverse" src="https://github.com/user-attachments/assets/89182063-0309-46cb-9c8d-ed52fc4089f0" />
+<img width="1311" height="604" alt="signup" src="https://github.com/user-attachments/assets/317fe4dd-7adc-4d5d-a471-b8ffd44bf5c6" />
+<img width="1304" height="602" alt="signin" src="https://github.com/user-attachments/assets/aafb3228-8cd5-4e01-be30-4a958015c9de" />
+<img width="1360" height="597" alt="subscriptions" src="https://github.com/user-attachments/assets/6e84784a-9d54-4a3a-a8bd-276212e9c3e6" />
+
+
 
 ## Possible future improvements
 
